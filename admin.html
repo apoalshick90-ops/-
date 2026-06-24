@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم متجر ياسر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background: #0a0a0a; color: #fff; }
+        body { background: #0a0a0a; color: #fff; min-height: 100vh; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #1a1a1a, #2d2d2d); padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; border: 1px solid #333; }
-        .header h1 { color: #00ff88; text-shadow: 0 0 10px #00ff88; }
-        .login-box { background: #1a1a1a; padding: 30px; border-radius: 15px; max-width: 400px; margin: 50px auto; border: 1px solid #333; }
+        .header { background: linear-gradient(135deg, #1a1a1a, #2d2d2d); padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; border: 1px solid #333; position: relative; }
+        .header h1 { color: #00ff88; text-shadow: 0 0 10px #00ff88; font-size: 28px; }
+        .login-box { background: #1a1a1a; padding: 30px; border-radius: 15px; max-width: 400px; margin: 50px auto; border: 1px solid #333; box-shadow: 0 0 20px rgba(0,255,136,0.1); }
         .login-box h2 { color: #00ff88; margin-bottom: 20px; text-align: center; }
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 16px; }
         input:focus, textarea:focus { outline: none; border-color: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
@@ -19,17 +20,17 @@
         .dashboard { display: none; }
         .app-form { background: #1a1a1a; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
         .app-list { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        .app-item { background: #0a0a0a; padding: 15px; border-radius: 10px; margin: 10px 0; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .app-item img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
-        .app-info { flex: 1; margin: 0 15px; }
+        .app-item { background: #0a0a0a; padding: 15px; border-radius: 10px; margin: 10px 0; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        .app-item img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 1px solid #333; }
+        .app-info { flex: 1; }
         .app-info h3 { color: #00ff88; margin-bottom: 5px; }
-        .app-info p { color: #ccc; font-size: 14px; }
+        .app-info p { color: #ccc; font-size: 14px; margin-bottom: 3px; }
         .delete-btn { background: #ff0044; color: #fff; padding: 8px 15px; border-radius: 5px; width: auto; }
         .delete-btn:hover { background: #cc0036; }
-        .logout-btn { background: #ff0044; width: auto; padding: 8px 20px; float: left; }
-        .error { color: #ff0044; margin-top: 10px; text-align: center; }
-        .success { color: #00ff88; margin-top: 10px; text-align: center; }
-        label { color: #00ff88; display: block; margin-top: 10px; }
+        .logout-btn { background: #ff0044; width: auto; padding: 8px 20px; position: absolute; left: 20px; top: 50%; transform: translateY(-50%); }
+        .error { color: #ff0044; margin-top: 10px; text-align: center; font-weight: bold; }
+        .success { color: #00ff88; margin-top: 10px; text-align: center; font-weight: bold; }
+        label { color: #00ff88; display: block; margin-top: 10px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -75,28 +76,28 @@
         </div>
     </div>
 
-    <!-- Firebase -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // 1. حط إعدادات Firebase تبعك هون - نفس اللي بصفحة index.html
+        // إعدادات Firebase تبعك - صحيحة 100%
         const firebaseConfig = {
-            apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            apiKey: "AIzaSyBpHQWj6zPwcW_0NILhZXShS3BNlI39yzM",
             authDomain: "maoqea-9f7bd.firebaseapp.com",
             projectId: "maoqea-9f7bd",
-            storageBucket: "maoqea-9f7bd.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456"
+            storageBucket: "maoqea-9f7bd.firebasestorage.app",
+            messagingSenderId: "361292746574",
+            appId: "1:361292746574:web:dce01eabeec060ca00181f"
         };
 
-        // 2. تشغيل Firebase
+        // تشغيل Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 3. التحقق من حالة الدخول
+        // مراقبة حالة الدخول
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('loginBox').style.display = 'none';
@@ -110,11 +111,16 @@
             }
         });
 
-        // 4. دالة الدخول - المعدلة عشان تبين الخطأ
+        // دالة الدخول مع عرض الخطأ الحقيقي
         function login() {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const msgDiv = document.getElementById('loginMsg');
+            
+            if (!email || !password) {
+                msgDiv.innerHTML = '<div class="error">اكتب الإيميل وكلمة السر</div>';
+                return;
+            }
             
             msgDiv.innerHTML = '<div class="success">جاري التحقق...</div>';
             
@@ -129,26 +135,28 @@
                     } else if (e.code === 'auth/operation-not-allowed') {
                         msgDiv.innerHTML = '<div class="error">تسجيل الدخول بالإيميل مو مفعل من Firebase</div>';
                     } else if (e.code === 'auth/unauthorized-domain') {
-                        msgDiv.innerHTML = '<div class="error">دومين GitHub مو مضاف بالمسموحات</div>';
+                        msgDiv.innerHTML = '<div class="error">ضيف apoalshick90-ops.github.io بالـ Authorized domains</div>';
                     } else if (e.code === 'auth/too-many-requests') {
-                        msgDiv.innerHTML = '<div class="error">محاولات كثيرة. حاول بعد شوي</div>';
+                        msgDiv.innerHTML = '<div class="error">محاولات كثيرة. استنى شوي وجرب</div>';
+                    } else if (e.code === 'auth/api-key-not-valid') {
+                        msgDiv.innerHTML = '<div class="error">الـ API Key غلط. تأكد من firebaseConfig</div>';
                     } else {
                         msgDiv.innerHTML = `<div class="error">خطأ: ${e.code}</div>`;
                     }
                 });
         }
 
-        // 5. تسجيل خروج
+        // تسجيل خروج
         function logout() {
             auth.signOut();
         }
 
-        // 6. إضافة تطبيق
+        // إضافة تطبيق
         function addApp() {
-            const name = document.getElementById('appName').value;
-            const desc = document.getElementById('appDesc').value;
-            const link = document.getElementById('appLink').value;
-            const image = document.getElementById('appImage').value;
+            const name = document.getElementById('appName').value.trim();
+            const desc = document.getElementById('appDesc').value.trim();
+            const link = document.getElementById('appLink').value.trim();
+            const image = document.getElementById('appImage').value.trim();
             const msgDiv = document.getElementById('formMsg');
 
             if (!name || !desc || !link || !image) {
@@ -171,16 +179,16 @@
                 document.getElementById('appDesc').value = '';
                 document.getElementById('appLink').value = '';
                 document.getElementById('appImage').value = '';
-                loadApps();
+                setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
             }).catch(e => {
                 msgDiv.innerHTML = `<div class="error">خطأ: ${e.message}</div>`;
             });
         }
 
-        // 7. تحميل التطبيقات
+        // تحميل التطبيقات
         function loadApps() {
             const listDiv = document.getElementById('appsList');
-            listDiv.innerHTML = 'جاري التحميل...';
+            listDiv.innerHTML = '<p style="text-align:center;color:#666">جاري التحميل...</p>';
             
             db.collection('apps').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
                 listDiv.innerHTML = '';
@@ -192,7 +200,7 @@
                     const app = doc.data();
                     listDiv.innerHTML += `
                         <div class="app-item">
-                            <img src="${app.imageUrl}" onerror="this.src='https://via.placeholder.com/60'">
+                            <img src="${app.imageUrl}" onerror="this.src='https://via.placeholder.com/60/1a1a1a/00ff88?text=App'">
                             <div class="app-info">
                                 <h3>${app.name}</h3>
                                 <p>${app.description}</p>
@@ -202,13 +210,17 @@
                         </div>
                     `;
                 });
+            }, err => {
+                listDiv.innerHTML = `<p class="error">خطأ بالتحميل: ${err.message}</p>`;
             });
         }
 
-        // 8. حذف تطبيق
+        // حذف تطبيق
         function deleteApp(id) {
             if (confirm('متأكد بدك تحذف هاد التطبيق؟')) {
-                db.collection('apps').doc(id).delete();
+                db.collection('apps').doc(id).delete().catch(e => {
+                    alert('خطأ بالحذف: ' + e.message);
+                });
             }
         }
     </script>
