@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ياسر أبو الشيخ - متجر التطبيقات</title>
+    <title>متجر ياسر أبو الشيخ</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background: #0a0a0a; color: #fff; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #1a1a1a, #2d2d2d); padding: 30px 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; border: 1px solid #333; }
-        .header h1 { color: #00ff88; text-shadow: 0 0 15px #00ff88; font-size: 32px; margin-bottom: 10px; }
-        .header p { color: #ccc; }
-        .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .app-card { background: #1a1a1a; border-radius: 15px; padding: 20px; border: 1px solid #333; transition: 0.3s; }
-        .app-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 255, 136, 0.2); border-color: #00ff88; }
-        .app-card img { width: 80px; height: 80px; border-radius: 15px; object-fit: cover; margin-bottom: 15px; border: 1px solid #333; }
-        .app-card h3 { color: #00ff88; margin-bottom: 10px; font-size: 20px; }
-        .app-card p { color: #ccc; margin-bottom: 15px; font-size: 14px; min-height: 40px; }
-        .download-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #00ff88, #00cc6a); border: none; border-radius: 8px; color: #000; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; text-decoration: none; display: block; text-align: center; }
-        .download-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4); }
-        .downloads-count { color: #00ff88; font-size: 12px; margin-top: 8px; text-align: center; }
-        .loading { text-align: center; color: #00ff88; font-size: 18px; padding: 50px; }
+        .header { background: linear-gradient(135deg, #1a1a1a, #2d2d2d); padding: 40px 20px; border-radius: 20px; margin-bottom: 30px; text-align: center; border: 1px solid #333; }
+        .header h1 { color: #00ff88; text-shadow: 0 0 20px #00ff88; font-size: 36px; margin-bottom: 10px; }
+        .header p { color: #ccc; font-size: 18px; }
+        .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .app-card { background: #1a1a1a; border-radius: 20px; padding: 25px; border: 1px solid #333; transition: 0.3s; }
+        .app-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0, 255, 136, 0.3); border-color: #00ff88; }
+        .app-card img { width: 90px; height: 90px; border-radius: 20px; object-fit: cover; margin-bottom: 15px; border: 2px solid #333; background: #2d2d2d; }
+        .app-card h3 { color: #00ff88; margin-bottom: 10px; font-size: 22px; }
+        .app-card p { color: #ccc; margin-bottom: 20px; font-size: 15px; min-height: 45px; line-height: 1.6; }
+        .download-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #00ff88, #00cc6a); border: none; border-radius: 12px; color: #000; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s; text-decoration: none; display: block; text-align: center; }
+        .download-btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0, 255, 136, 0.5); }
+        .downloads-count { color: #00ff88; font-size: 13px; margin-top: 10px; text-align: center; }
+        .loading { text-align: center; color: #00ff88; font-size: 20px; padding: 60px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>متجر ياسر أبو الشيخ</h1>
-            <p>أحدث التطبيقات المعدلة والآمنة</p>
+            <p>أحدث التطبيقات المعدلة والآمنة 2026</p>
         </div>
 
         <div id="appsContainer" class="apps-grid">
@@ -36,12 +36,10 @@
         </div>
     </div>
 
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // نفس إعدادات Firebase تبع الادمن
         const firebaseConfig = {
             apiKey: "AIzaSyBpHQWj6zPwcW_0NILhZXShS3BNlI39yzM",
             authDomain: "maoqea-9f7bd.firebaseapp.com",
@@ -53,43 +51,48 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        
+        // صورة افتراضية لو الرابط خربان
+        const DEFAULT_IMAGE = 'https://i.imgur.com/8Qf5z9L.png';
 
-        // تحميل التطبيقات من Firebase
         function loadApps() {
             const container = document.getElementById('appsContainer');
             
             db.collection('apps').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-                container.innerHTML = '';
-                
                 if (snapshot.empty) {
                     container.innerHTML = '<div class="loading">لا توجد تطبيقات حالياً</div>';
                     return;
                 }
 
+                container.innerHTML = '';
                 snapshot.forEach(doc => {
                     const app = doc.data();
+                    const imgSrc = app.imageUrl && app.imageUrl.startsWith('http') ? app.imageUrl : DEFAULT_IMAGE;
+                    
                     container.innerHTML += `
                         <div class="app-card">
-                            <img src="${app.imageUrl}" onerror="this.src='https://via.placeholder.com/80/1a1a1a/00ff88?text=App'" alt="${app.name}">
+                            <img src="${imgSrc}" 
+                                 onerror="this.onerror=null; this.src='${DEFAULT_IMAGE}'" 
+                                 alt="${app.name}">
                             <h3>${app.name}</h3>
                             <p>${app.description}</p>
                             <a href="${app.downloadLink}" class="download-btn" onclick="incrementDownload('${doc.id}')" target="_blank">تحميل الآن</a>
-                            <div class="downloads-count">التحميلات: ${app.downloads || 0}</div>
+                            <div class="downloads-count">عدد التحميلات: ${app.downloads || 0}</div>
                         </div>
                     `;
                 });
+            }, error => {
+                container.innerHTML = '<div class="loading">صار خطأ بتحميل التطبيقات</div>';
+                console.error(error);
             });
         }
 
-        // زيادة عداد التحميلات
         function incrementDownload(appId) {
-            const appRef = db.collection('apps').doc(appId);
-            appRef.update({
+            db.collection('apps').doc(appId).update({
                 downloads: firebase.firestore.FieldValue.increment(1)
-            });
+            }).catch(err => console.log('Download count error:', err));
         }
 
-        // شغل التحميل اول ما تفتح الصفحة
         loadApps();
     </script>
 </body>
