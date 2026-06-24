@@ -41,20 +41,18 @@
     </div>
 
 <script>
-    // حط الكونفق تبعك من Firebase هون
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyBpHQWj6zPwcW_0NILhZXShS3BNLI39yzM",
+      authDomain: "maoqea-9f7bd.firebaseapp.com",
+      projectId: "maoqea-9f7bd",
+      storageBucket: "maoqea-9f7bd.firebasestorage.app",
+      messagingSenderId: "361292746574",
+      appId: "1:361292746574:web:dce01eabeec060ca00181f"
     };
     
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // جلب التطبيقات وعرضها
     async function loadApps() {
         const grid = document.getElementById('appsGrid');
         const snapshot = await db.collection('apps').orderBy('createdAt', 'desc').get();
@@ -81,7 +79,6 @@
         });
     }
 
-    // زيادة عداد التحميل
     async function downloadApp(id, link) {
         await db.collection('apps').doc(id).update({
             downloads: firebase.firestore.FieldValue.increment(1)
