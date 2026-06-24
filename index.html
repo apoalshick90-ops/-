@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ياسر أبو الشيخ - متجر التطبيقات</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        *{margin:0;box-sizing:border-box;font-family:Tahoma}
+        body{background:#000;color:#fff}
+        .header{background:linear-gradient(135deg, #1877F2 0%, #000 50%, #E50914 100%);padding:25px;text-align:center;box-shadow:0 4px 20px rgba(229,9,20,0.4)}
+        .header h1{font-size:32px;text-shadow:3px 3px 6px #000;margin-bottom:5px}
+        .header p{color:#ddd;font-size:16px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:18px;padding:20px;max-width:1400px;margin:auto}
+        .card{background:#0D0D0D;border:2px solid #1877F2;border-radius:18px;overflow:hidden;text-align:center;transition:0.4s;cursor:pointer}
+        .card:hover{transform:translateY(-10px) scale(1.03);border-color:#E50914;box-shadow:0 8px 25px rgba(229,9,20,0.7)}
+        .card img{width:100%;height:180px;object-fit:cover}
+        .card-content{padding:15px}
+        .card h3{font-size:16px;color:#1877F2;margin-bottom:10px;height:42px;line-height:1.3}
+        .card p{font-size:13px;color:#999;height:38px;overflow:hidden;margin-bottom:12px;line-height:1.4}
+        .card .stats{font-size:12px;color:#E50914;margin-bottom:10px}
+        .card a{display:block;background:linear-gradient(45deg, #E50914, #1877F2);color:white;padding:13px;text-decoration:none;font-weight:bold;border-radius:10px;transition:0.3s}
+        .card a:hover{opacity:0.8}
+        .footer{text-align:center;padding:25px;color:#666;border-top:2px solid #111;margin-top:40px;font-size:14px}
+        .loading{text-align:center;padding:60px;color:#1877F2;font-size:20px}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ياسر أبو الشيخ</h1>
+        <p>متجر التطبيقات والمواقع الرسمي</p>
+    </div>
+
+    <div class="grid" id="appsGrid">
+        <div class="loading">جاري التحميل...</div>
+    </div>
+
+    <div class="footer">
+        جميع الحقوق محفوظة © ياسر أبو الشيخ 2026
+    </div>
+
+<script>
+    // حط الكونفق تبعك من Firebase هون
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // جلب التطبيقات وعرضها
+    async function loadApps() {
+        const grid = document.getElementById('appsGrid');
+        const snapshot = await db.collection('apps').orderBy('createdAt', 'desc').get();
+        
+        if(snapshot.empty) {
+            grid.innerHTML = '<div class="loading">لا يوجد تطبيقات حالياً</div>';
+            return;
+        }
+
+        grid.innerHTML = '';
+        snapshot.forEach(doc => {
+            const app = doc.data();
+            grid.innerHTML += `
+                <div class="card" onclick="downloadApp('${doc.id}', '${app.link}')">
+                    <img src="${app.image}" alt="${app.title}">
+                    <div class="card-content">
+                        <h3>${app.title}</h3>
+                        <p>${app.description}</p>
+                        <div class="stats">⬇️ ${app.downloads || 0} تحميل</div>
+                        <a href="${app.link}" target="_blank">تحميل الآن</a>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // زيادة عداد التحميل
+    async function downloadApp(id, link) {
+        await db.collection('apps').doc(id).update({
+            downloads: firebase.firestore.FieldValue.increment(1)
+        });
+        window.open(link, '_blank');
+        setTimeout(loadApps, 1000);
+    }
+
+    loadApps();
+</script>
+</body>
+</html>

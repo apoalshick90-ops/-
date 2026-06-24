@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم ياسر أبو الشيخ</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        *{margin:0;box-sizing:border-box;font-family:Tahoma}
+        body{background:#000;color:#fff;padding:15px}
+        .box{background:#0D0D0D;padding:25px;border-radius:15px;max-width:700px;margin:20px auto;border:2px solid #E50914}
+        h2{color:#1877F2;margin-bottom:20px;text-align:center;font-size:26px}
+        input,textarea{width:100%;padding:14px;margin:10px 0;background:#1A1A1A;border:2px solid #1877F2;color:#fff;border-radius:8px;font-size:15px}
+        button{background:linear-gradient(45deg, #E50914, #1877F2);color:white;border:none;padding:15px;width:100%;cursor:pointer;border-radius:8px;font-weight:bold;font-size:17px;margin-top:10px}
+        table{width:100%;margin-top:30px;background:#0D0D0D;border-collapse:collapse;border-radius:10px;overflow:hidden}
+        td,th{padding:14px;border:1px solid #222;text-align:center}
+        th{background:#1877F2;font-size:16px}
+        .login-box{max-width:400px}
+        .hidden{display:none}
+        .logout{position:fixed;top:15px;left:15px;background:#E50914;padding:10px 15px;border-radius:8px;cursor:pointer}
+    </style>
+</head>
+<body>
+    <div id="loginBox" class="box login-box">
+        <h2>🔐 دخول لوحة التحكم</h2>
+        <input type="email" id="email" placeholder="الايميل">
+        <input type="password" id="password" placeholder="كلمة المرور">
+        <button onclick="login()">دخول</button>
+        <p id="loginError" style="color:#E50914;margin-top:10px;text-align:center"></p>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+        <div class="logout" onclick="logout()">🚪 خروج</div>
+        <div class="box">
+            <h2>➕ إضافة تطبيق/رابط جديد</h2>
+            <input id="appTitle" placeholder="اسم التطبيق أو الموقع" required>
+            <input id="appImage" placeholder="رابط الصورة" required>
+            <input id="appLink" placeholder="رابط التحميل من ميديا فاير" required>
+            <textarea id="appDesc" placeholder="وصف التطبيق" rows="3" required></textarea>
+            <button onclick="addApp()">إضافة للموقع</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr><th>الصورة</th><th>الاسم</th><th>الوصف</th><th>التحميلات</th><th>حذف</th></tr>
+            </thead>
+            <tbody id="appsTable"></tbody>
+        </table>
+    </div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function login() {
+        auth.signInWithEmailAndPassword(
+            document.getElementById('email').value,
+            document.getElementById('password').value
+        ).catch(err => document.getElementById('loginError').innerText = err.message);
+    }
+
+    function logout() { auth.signOut(); }
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            loadApps();
+        } else {
+            document.getElementById('loginBox').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+        }
+    });
+
+    async function addApp() {
+        const title = document.getElementById('appTitle').value;
+        const image = document.getElementById('appImage').value;
+        const link = document.getElementById('appLink').value;
+        const desc = document.getElementById('appDesc').value;
+        
+        if(!title || !image || !link || !desc) return alert('عبي كل الحقول');
+
+        await db.collection('apps').add({
+            title: title,
+            image: image,
+            link: link,
+            description: desc,
+            downloads: 0,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        document.getElementById('appTitle').value = '';
+        document.getElementById('appImage').value = '';
+        document.getElementById('appLink').value = '';
+        document.getElementById('appDesc').value = '';
+        loadApps();
+    }
+
+    async function loadApps() {
+        const table = document.getElementById('appsTable');
+        table.innerHTML = '';
+        const snapshot = await db.collection('apps').orderBy('createdAt', 'desc').get();
+        
+        snapshot.forEach(doc => {
+            const app = doc.data();
+            table.innerHTML += `
+                <tr>
+                    <td><img src="${app.image}" width="70" height="70" style="object-fit:cover;border-radius:10px;border:2px solid #1877F2"></td>
+                    <td style="color:#1877F2">${app.title}</td>
+                    <td style="max-width:250px;font-size:13px">${app.description}</td>
+                    <td style="color:#E50914">${app.downloads || 0}</td>
+                    <td><span onclick="deleteApp('${doc.id}')" style="cursor:pointer">❌</span></td>
+                </tr>
+            `;
+        });
+    }
+
+    async function deleteApp(id) {
+        if(confirm('متأكد من الحذف؟')) {
+            await db.collection('apps').doc(id).delete();
+            loadApps();
+        }
+    }
+</script>
+</body>
+</html>
